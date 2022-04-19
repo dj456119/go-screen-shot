@@ -1,17 +1,28 @@
+/*
+ * @Descripttion:
+ * @version:
+ * @Author: cm.d
+ * @Date: 2022-04-19 14:36:45
+ * @LastEditors: cm.d
+ * @LastEditTime: 2022-04-19 23:32:17
+ */
 package gui
 
 import (
 	"fmt"
+	"os/exec"
+	"screencarry/pkg/shot"
+	"screencarry/pkg/v"
+
 	"fyne.io/fyne"
 	"fyne.io/fyne/app"
 	"fyne.io/fyne/layout"
 	"fyne.io/fyne/widget"
 	hook "github.com/robotn/gohook"
-	"os/exec"
-	"screencarry/pkg/shot"
 )
 
 const version = "v1.1"
+
 func Create() {
 	myApp := app.New()
 	myWin := myApp.NewWindow("截图工具")
@@ -26,8 +37,26 @@ func Create() {
 			label.SetText("designed by mirrorlied - " + version)
 		}
 	})
+	btn2 := widget.NewButton("YZShot", func() {
+		if l := shot.Goshot(); l != "" {
+			label.SetText("yz save start: " + l)
+		} else {
+			label.SetText("designed by mirrorlied - " + version)
+		}
+	})
+	stop := widget.NewButton("StopYZ", func() {
+		shot.IsStart = false
+		label.SetText("yz save stop: ok")
+	})
+	view := widget.NewButton("View", func() {
+		viewWin := myApp.NewWindow("图片实时浏览")
+		viewWin.CenterOnScreen()
+		go v.ChangeContent(viewWin.Canvas())
+		viewWin.Resize(fyne.NewSize(1000, 600))
+		viewWin.Show()
+	})
 	// Todo: 音效
-	container := fyne.NewContainerWithLayout(layout.NewVBoxLayout(), btn1, label)
+	container := fyne.NewContainerWithLayout(layout.NewVBoxLayout(), btn1, btn2, stop, view, label)
 	myWin.SetContent(container)
 	myWin.Resize(fyne.NewSize(300, 80))
 	add(myWin, label)
